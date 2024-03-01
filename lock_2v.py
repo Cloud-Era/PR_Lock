@@ -30,3 +30,33 @@ if __name__ == "__main__":
             print("GitHub token not found. Make sure to set the GITHUB_TOKEN environment variable.")
         else:
             lock_pull_request(repo_owner, repo_name, pr_number, github_token)
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ YML
+
+
+name: Lock Pull Request
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  lock_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set PR_NUMBER environment variable
+        run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+      
+      - name: Execute Python script
+        run: python lock_pull_request.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ env.PR_NUMBER }}
+

@@ -1,0 +1,22 @@
+from github import Github
+import os
+
+# GitHub personal access token
+access_token = os.getenv('GITHUB_TOKEN')
+# Create a GitHub instance
+g = Github(access_token)
+
+def lock_pull_request(repo_name, pr_number):
+    try:
+        repo = g.get_repo(repo_name)
+        pr = repo.get_pull(pr_number)
+        pr.edit(lock_reason='resolved')
+        print(f"Pull request #{pr_number} in repository {repo_name} locked successfully.")
+    except Exception as e:
+        print(f"Error locking pull request: {e}")
+
+if __name__ == "__main__":
+    # Example usage
+    repo_name = 'owner/repository'
+    pr_number = 123
+    lock_pull_request(repo_name, pr_number)

@@ -1,0 +1,28 @@
+from github import Github
+
+# Enter your GitHub personal access token here
+access_token = 'YOUR_ACCESS_TOKEN'
+
+# Create a PyGithub instance
+g = Github(access_token)
+
+# Specify the repository owner and name
+repo_owner = 'REPOSITORY_OWNER'
+repo_name = 'REPOSITORY_NAME'
+
+# Specify the pull request number
+pr_number = PR_NUMBER
+
+# Get the repository
+repo = g.get_repo(f'{repo_owner}/{repo_name}')
+
+# Get the pull request
+pr = repo.get_pull(pr_number)
+
+# Check if the pull request is closed
+if pr.state == 'closed':
+    # Lock the pull request
+    pr.edit(lock_issue=True, lock_reason='Pull request is closed. Title and body are locked.')
+    print(f'Pull Request #{pr_number} locked successfully.')
+else:
+    print(f'Pull Request #{pr_number} is not closed. Title and body were not locked.')

@@ -61,4 +61,4 @@ curl -X PATCH \
   -d '{"title":"new title","body":"updated body","state":"open","base":"master"}' \
   "https://api.github.com/repos/OWNER/REPO/pulls/PULL_NUMBER"
 
-curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" -H "Accept: application/vnd.github.v3+json" -d '{"locked
+curl -X PUT -H "Authorization: Bearer YOUR_TOKEN" -H "Accept: application/vnd.github.v3+json" -d '{"locked":true}' https://api.github.com/repos/owner/testrepo/issues/19/lock

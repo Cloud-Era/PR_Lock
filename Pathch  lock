@@ -51,3 +51,13 @@ if __name__ == "__main__":
             print("GitHub token not found. Make sure to set the GITHUB_TOKEN environment variable.")
         else:
             lock_pull_request(repo_owner, repo_name, pr_number, github_token)
+
+
+
+curl -X PATCH \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Accept: application/vnd.github.v3+json" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"new title","body":"updated body","state":"open","base":"master"}' \
+  "https://api.github.com/repos/OWNER/REPO/pulls/PULL_NUMBER"
+

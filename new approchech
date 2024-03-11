@@ -1,61 +1,27 @@
-name: Copy CSV File to Repository
+from github import Github
+import os
 
-on:
-  push:
-    branches:
-      - main
-jobs:
-  copy_csv:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+# GitHub personal access token
+access_token = os.getenv('GITHUB_TOKEN')
+# Create a GitHub instance
+g = Github(access_token)
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.12'
-        
-    - name: Generate CSV file
-      run: python Sample_Py_create_csv_file.py  # Replace with the command to generate the CSV file
+def lock_pull_request(repo_name, pr_number, disable_edit=True):
+    try:
+        repo = g.get_repo(repo_name)
+        pr = repo.get_pull(pr_number)
+        if pr.state == "closed":
+            pr.edit(lock_reason='resolved', maintainer_can_modify=not disable_edit)
+            print(f"Pull request #{pr_number} in repository {repo_name} locked successfully.")
+            if disable_edit:
+                print("Edit feature disabled for the pull request.")
+        else:
+            print(f"Pull request #{pr_number} in repository {repo_name} is not closed.")
+    except Exception as e:
+        print(f"Error locking pull request: {e}")
 
-    - name: Move CSV file to repository
-      run: |
-        # cd $GITHUB_WORKSPACE || exit 1
-        # pwd
-        # csv_file=$(find . -name "*.csv" -type f)
-        # echo $csv_file
-        # if [ -n "$csv_file" ]; then
-        #   #mkdir -p csv_files
-        #   mv *.csv csv_files/
-        # else
-        #   echo "No CSV file found."
-        #   exit 1
-        # fi
-        ls -l
-        mkdir -p csv_files
-        mv *.csv csv_files/
-        ls -l csv_files/
-        cd csv_files
-        #rm REPORT_2024-02-24-Feb-02-1708732800.csv
-      
-    # - name: List files after moving
-    #   run: ls -l csv_files
-      
-    - name: Commit and push changes
-      run: |
-        cd $GITHUB_WORKSPACE || exit 1
-        if [[ $(git status --porcelain) ]]; then
-          git config --local user.email "gv.reddy77@gmail.com"
-          git config --local user.name "omega1477"
-          #git add .
-          git add csv_files/*.csv
-          git commit -m "Add generated CSV file"
-          git push origin main
-        else
-          echo "No changes to commit."
-        fi
-      shell: bash
-      env:
-        ACCESS_TOKEN: $ {{ secrets.ACCESS_TOKEN }}
+if __name__ == "__main__":
+    # Example usage
+    repo_name = 'owner/repository'
+    pr_number = 123
+    lock_pull_request(repo_name, pr_number, disable_edit=True)

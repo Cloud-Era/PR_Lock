@@ -1,0 +1,38 @@
+import os
+import requests
+
+def lock_pull_request(repo_owner, repo_name, pr_number, github_token):
+    headers = {
+        "Authorization": f"token {github_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/pulls/{pr_number}/lock"
+    print(f"URL: {url}")
+
+    response = requests.put(url, headers=headers)
+
+    print(f"Request Headers: {response.request.headers}")
+    print(f"Request Body: {response.request.body}")
+
+    if response.status_code == 204:
+        print(f"Pull request #{pr_number} locked successfully.")
+    else:
+        print(f"Failed to lock pull request #{pr_number}. Status code: {response.status_code}")
+        print(f"Response content: {response.content}")
+
+if __name__ == "__main__":
+    # GitHub repository information
+    repo_owner = "your_org_or_username"
+    repo_name = "your_repository_name"
+    
+    # Pull request number obtained from the environment variable
+    pr_number = os.getenv("PR_NUMBER")
+    if not pr_number:
+        print("Pull request number not found. Make sure to set the PR_NUMBER environment variable.")
+    else:
+        # GitHub personal access token
+        github_token = os.getenv("GITHUB_TOKEN")
+        if not github_token:
+            print("GitHub token not found. Make sure to set the GITHUB_TOKEN environment variable.")
+        else:
+            lock_pull_request(repo_owner, repo_name, pr_number, github_token)

@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# GitHub repository information
+repo_owner="your_org_or_username"
+repo_name="your_repository_name"
+
+# Pull request number obtained from the environment variable
+pr_number=$PR_NUMBER
+
+if [ -z "$pr_number" ]; then
+  echo "Pull request number not found. Make sure to set the PR_NUMBER environment variable."
+  exit 1
+fi
+
+# GitHub personal access token
+github_token=$GITHUB_TOKEN
+
+if [ -z "$github_token" ]; then
+  echo "GitHub token not found. Make sure to set the GITHUB_TOKEN environment variable."
+  exit 1
+fi
+
+# Construct the API endpoint URL
+url="https://api.github.com/repos/${repo_owner}/${repo_name}/pulls/${pr_number}"
+
+# Construct the JSON payload with the updated title and body
+json_payload='{"title":"'$(curl -s -H "Authorization: Bearer ${github_token}" -H "Accept: application/vnd.github.v3+json" "${url}" | jq -r '.title')'","body":"'$(curl -s -H "Authorization: Bearer ${github_token}" -H "Accept: application/vnd.github.v3+json" "${url}" | jq -r '.body')'","state":"open","base":"master"}'
+
+# Send the PATCH request using curl
+response=$(curl -L \
+  -X PATCH \
+  -H "Accept: application/vnd.github.v3+json" \
+  -H "Authorization: Bearer ${github_token}" \
+  -d "${json_payload}" \
+  "${url}")
+
+# Check the response status
+if [ $? -eq 0 ]; then
+  echo "Pull request #${pr_number} locked successfully."
+else
+  echo "Failed to lock pull request #${pr_number}. Response: ${response}"
+fi

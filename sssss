@@ -1,0 +1,31 @@
+import os
+from github import Github
+
+# GitHub personal access token
+access_token = os.getenv('GITHUB_TOKEN')
+# Create a GitHub instance
+g = Github(access_token)
+
+def lock_pull_request(repo_name, pr_number, disable_edit=True):
+    try:
+        repo = g.get_repo(repo_name)
+        pr = repo.get_pull(pr_number)
+        if pr.state == "closed":
+            pr.edit(maintainer_can_modify=not disable_edit)
+            pr.as_issue().edit(labels=["locked"])
+            print(f"Pull request #{pr_number} in repository {repo_name} locked successfully.")
+            if disable_edit:
+                print("Edit feature disabled for the pull request.")
+        else:
+            print(f"Pull request #{pr_number} in repository {repo_name} is not closed.")
+    except Exception as e:
+        print(f"Error locking pull request: {e}")
+
+if __name__ == "__main__":
+    # Retrieve pull request number from environment variable
+    pr_number = os.getenv("pr_number")
+    if pr_number:
+        repo_name = 'owner/repository'  # Replace with the actual repository name
+        lock_pull_request(repo_name, int(pr_number), disable_edit=True)
+    else:
+        print("Pull request number not found in the environment variable.")

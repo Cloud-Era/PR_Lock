@@ -1,32 +1,30 @@
-name: Deploy Site
+name: Push to Remote Repo
 
 on:
   push:
     branches:
-      - master
-    paths:
-      - 'docs/**'
-      - '*.yml'
+      - main
 
 jobs:
-  build:
+  push_to_remote:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.7
-      
-      - name: Install dependencies
+
+      # Add your steps here to make changes to the repository
+      # For example, you can run commands to create or modify files
+
+      - name: Commit changes
         run: |
-          python -m pip install --upgrade pip setuptools
-          python -m pip install -r requirements.txt
-      
-      - name: Deploy Files
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Auto commit changes"
+
+      - name: Push changes to remote repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --local user.name "${{ secrets.GH_USER }}"
-          git config --local user.email "${{ secrets.GH_MAIL }}"
-          git remote add gh-token "https://${{ secrets.GH_TOKEN }}@github.com/${{ git
+          git push https://github.com/${{ github.repository }}.git HEAD:main

@@ -1,8 +1,32 @@
-- name: Checkout repository
-        uses: actions/checkout@v2  # Action to checkout the repository
+name: Deploy Site
 
-      - name: Print current directory
-        run: pwd  # Command to print current directory
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - '*.yml'
 
-      - name: List all files and directories
-        run: ls -a  # Command to list all files and directories, including hidden ones
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          python -m pip install -r requirements.txt
+      
+      - name: Deploy Files
+        run: |
+          git config --local user.name "${{ secrets.GH_USER }}"
+          git config --local user.email "${{ secrets.GH_MAIL }}"
+          git remote add gh-token "https://${{ secrets.GH_TOKEN }}@github.com/${{ git

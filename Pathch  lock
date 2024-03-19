@@ -54,6 +54,11 @@ if __name__ == "__main__":
 
 
 
+- name: Unlock Terraform State
+        run: |
+          # Use the terraform force-unlock command to release the state lock
+          terraform force-unlock $TERRAFORM_LOCK_ID
+
 curl -X PATCH \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
